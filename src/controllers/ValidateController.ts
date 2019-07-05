@@ -2,13 +2,16 @@ import { ValidationResponse } from './../types/ValidationResponse';
 import { ValidationRequest } from './../types/ValidationRequest';
 import { ValidationResult } from 'amphtml-validator';
 import { AmpValidationService } from './../services/AmpValidationService';
-import { JsonController, Post, Body, BadRequestError } from 'routing-controllers';
+import { JsonController, Post, Body, BadRequestError, Res } from 'routing-controllers';
 import axios, { AxiosResponse, AxiosError } from 'axios';
 
 @JsonController('/validate')
 export class ValidateController {
     @Post('/')
     public async validate(@Body() validationRequest: ValidationRequest): Promise<ValidationResponse> {
+        if (!validationRequest.url || typeof validationRequest.url !== 'string') {
+            throw new BadRequestError('string url property is missing');
+        }
         let response: ValidationResponse = this.initResponse();
         try {
             const page: AxiosResponse = await this.getHtml(validationRequest.url);
@@ -48,6 +51,7 @@ export class ValidateController {
             return axiosResponse;
         } catch (error) {
             console.log(error.message);
+            // AxiosError.response is of type AxsionResponse
             return error.response;
         }
     }
