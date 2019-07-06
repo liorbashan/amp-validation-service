@@ -3,7 +3,7 @@ import { ValidationRequest } from './../types/ValidationRequest';
 import { ValidationResult } from 'amphtml-validator';
 import { AmpValidationService } from './../services/AmpValidationService';
 import { JsonController, Post, Body, BadRequestError, Res } from 'routing-controllers';
-import axios, { AxiosResponse, AxiosError } from 'axios';
+import axios, { AxiosResponse } from 'axios';
 
 @JsonController('/validate')
 export class ValidateController {
