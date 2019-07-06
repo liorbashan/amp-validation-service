@@ -1,14 +1,17 @@
-import { ValidationResponse } from './../types/ValidationResponse';
+import { ValidationResponse, BulkValidationResponse } from './../types/ValidationResponse';
 import { ValidationRequest } from './../types/ValidationRequest';
 import { ValidationResult } from 'amphtml-validator';
 import { AmpValidationService } from './../services/AmpValidationService';
-import { JsonController, Post, Body, BadRequestError } from 'routing-controllers';
-import axios, { AxiosResponse, AxiosError } from 'axios';
+import { JsonController, Post, Body, BadRequestError, Res } from 'routing-controllers';
+import axios, { AxiosResponse } from 'axios';
 
 @JsonController('/validate')
 export class ValidateController {
     @Post('/')
     public async validate(@Body() validationRequest: ValidationRequest): Promise<ValidationResponse> {
+        if (!this.isHttpRequestValid(validationRequest)) {
+            throw new BadRequestError('string url property is missing');
+        }
         let response: ValidationResponse = this.initResponse();
         try {
             const page: AxiosResponse = await this.getHtml(validationRequest.url);
@@ -37,8 +40,32 @@ export class ValidateController {
         return response;
     }
 
+    @Post('/bulk')
+    public async bulkValidate(@Body() request: ValidationRequest[]): Promise<BulkValidationResponse[]> {
+        if (request.length > Number(process.env.BULK_SIZE)) {
+            throw new BadRequestError(`Number of sites in request is limited to ${process.env.BULK_SIZE}`);
+        }
+        let result: BulkValidationResponse[] = [];
+        for (const site of request) {
+            const validationResponse: ValidationResponse = await this.validate(site);
+            let singleValidationResponse: BulkValidationResponse = {
+                [site.url]: validationResponse,
+            };
+            result.push(singleValidationResponse);
+        }
+        return result;
+    }
+
     private initResponse(): ValidationResponse {
         return { checked: false, error: '', status: 500, valid: null };
+    }
+
+    private isHttpRequestValid(request: ValidationRequest): boolean {
+        if (request.url && typeof request.url === 'string') {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     // TODO: This should be a singleton serive
@@ -48,6 +75,7 @@ export class ValidateController {
             return axiosResponse;
         } catch (error) {
             console.log(error.message);
+            // AxiosError.response is of type AxsionResponse
             return error.response;
         }
     }
