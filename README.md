@@ -35,6 +35,49 @@ Expect a JSON response:
 }
 ```
 
+# Bulk Requests
+
+Request:
+
+```javascript
+[
+    {
+        url: 'https://www.imdb.co',
+    },
+    {
+        url: 'https://www.cnn.com',
+    },
+    {
+        url: 'https://www.foobar.com',
+    },
+];
+```
+
+Response:
+
+```javascript
+
+"https://www.imdb.com": {
+    "checked": true,
+    "error": "",
+    "status": 200,
+    "valid": true
+},
+"https://www.cnn.com": {
+    "checked": true,
+    "error": "",
+    "status": 200,
+    "valid": true
+},
+"https://www.foobar.com": {
+    "checked": true,
+    "error": "",
+    "status": 200,
+    "valid": true
+}
+
+```
+
 ## Contributing
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
