@@ -4,3 +4,7 @@ export type ValidationResponse = {
     valid: null | boolean;
     error: string;
 };
+
+export type BulkValidationResponse = {
+    [key: string]: ValidationResponse;
+};

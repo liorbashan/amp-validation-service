@@ -18,6 +18,7 @@
             "NODE_ENV": "development",
             "NODE_TLS_REJECT_UNAUTHORIZED": "0",
             "PORT": "3000",
+            "BULK_SIZE": "50",
         },
     }]
 }
