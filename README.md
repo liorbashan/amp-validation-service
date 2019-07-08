@@ -1,6 +1,6 @@
 # amp-validation-service
 
-amp-validation-service is a service for validating HTML strings based on routing-controllers + express and amphtml-validator.
+amp-validation-service is a service for validating HTML strings based on routing-controllers + express and amphtml-validator using Typescript.
 
 ## Installation
 
