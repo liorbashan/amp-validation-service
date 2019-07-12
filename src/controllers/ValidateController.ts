@@ -1,20 +1,24 @@
+import { HttpClientService } from './../services/HttpClientService';
 import { ValidationResponse, BulkValidationResponse } from './../types/ValidationResponse';
 import { ValidationRequest } from './../types/ValidationRequest';
 import { ValidationResult } from 'amphtml-validator';
 import { AmpValidationService } from './../services/AmpValidationService';
 import { JsonController, Post, Body, BadRequestError, Res } from 'routing-controllers';
-import axios, { AxiosResponse } from 'axios';
+import { AxiosResponse } from 'axios';
+import { IHttpClient } from '../interfaces/IHttpClient';
+import { Helper } from '../utils/Helper';
 
 @JsonController('/validate')
 export class ValidateController {
     @Post('/')
     public async validate(@Body() validationRequest: ValidationRequest): Promise<ValidationResponse> {
-        if (!this.isHttpRequestValid(validationRequest)) {
+        if (!Helper.isHttpRequestValid(validationRequest)) {
             throw new BadRequestError('string url property is missing');
         }
-        let response: ValidationResponse = this.initResponse();
+        let response: ValidationResponse = Helper.initResponse();
         try {
-            const page: AxiosResponse = await this.getHtml(validationRequest.url);
+            const http: IHttpClient = HttpClientService.getInstance();
+            const page: AxiosResponse = await http.getHtml(validationRequest.url);
             if (page.status === 200 || page.status === 204) {
                 const validator: AmpValidationService = AmpValidationService.getInstance();
                 const validationResult: ValidationResult = await validator.validate(page.data);
@@ -54,29 +58,5 @@ export class ValidateController {
             result.push(singleValidationResponse);
         }
         return result;
-    }
-
-    private initResponse(): ValidationResponse {
-        return { checked: false, error: '', status: 500, valid: null };
-    }
-
-    private isHttpRequestValid(request: ValidationRequest): boolean {
-        if (request.url && typeof request.url === 'string') {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    // TODO: This should be a singleton serive
-    private async getHtml(url: string): Promise<AxiosResponse> {
-        try {
-            const axiosResponse: AxiosResponse = await axios.get(url);
-            return axiosResponse;
-        } catch (error) {
-            console.log(error.message);
-            // AxiosError.response is of type AxsionResponse
-            return error.response;
-        }
     }
 }
