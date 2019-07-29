@@ -59,4 +59,6 @@ export class ValidateController {
         }
         return result;
     }
+
+    // TODO: Create a validator for HTML text.
 }
