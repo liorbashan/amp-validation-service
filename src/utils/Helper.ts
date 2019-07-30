@@ -1,4 +1,4 @@
-import { ValidationRequest } from './../types/ValidationRequest';
+import { ValidationRequest, ContentValidationRequest } from './../types/ValidationRequest';
 import { ValidationResponse } from './../types/ValidationResponse';
 
 export abstract class Helper {
@@ -8,6 +8,14 @@ export abstract class Helper {
 
     public static isHttpRequestValid(request: ValidationRequest): boolean {
         if (request.url && typeof request.url === 'string') {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public static isContentRequestValid(request: ContentValidationRequest): boolean {
+        if (request.document && typeof request.document === 'string') {
             return true;
         } else {
             return false;

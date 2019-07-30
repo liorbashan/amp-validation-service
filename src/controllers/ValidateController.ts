@@ -1,6 +1,6 @@
 import { HttpClientService } from './../services/HttpClientService';
-import { ValidationResponse, BulkValidationResponse } from './../types/ValidationResponse';
-import { ValidationRequest } from './../types/ValidationRequest';
+import { ValidationResponse, BulkValidationResponse, ContentValidationResponse } from './../types/ValidationResponse';
+import { ValidationRequest, ContentValidationRequest } from './../types/ValidationRequest';
 import { ValidationResult } from 'amphtml-validator';
 import { AmpValidationService } from './../services/AmpValidationService';
 import { JsonController, Post, Body, BadRequestError, Res } from 'routing-controllers';
@@ -8,7 +8,7 @@ import { AxiosResponse } from 'axios';
 import { IHttpClient } from '../interfaces/IHttpClient';
 import { Helper } from '../utils/Helper';
 
-@JsonController('/validate')
+@JsonController('/validate-page')
 export class ValidateController {
     @Post('/')
     public async validate(@Body() validationRequest: ValidationRequest): Promise<ValidationResponse> {
@@ -44,7 +44,7 @@ export class ValidateController {
         return response;
     }
 
-    @Post('/bulk')
+    @Post('/validate-page-bulk')
     public async bulkValidate(@Body() request: ValidationRequest[]): Promise<BulkValidationResponse[]> {
         if (request.length > Number(process.env.BULK_SIZE)) {
             throw new BadRequestError(`Number of sites in request is limited to ${process.env.BULK_SIZE}`);
@@ -60,5 +60,29 @@ export class ValidateController {
         return result;
     }
 
-    // TODO: Create a validator for HTML text.
+    @Post('/validate-html')
+    public async validateHtml(@Body() request: ContentValidationRequest): Promise<ContentValidationResponse> {
+        if (!Helper.isContentRequestValid(request)) {
+            throw new BadRequestError('document must be a string');
+        }
+        let response: ContentValidationResponse = {
+            error: '',
+            valid: null,
+        };
+        try {
+            const validator: AmpValidationService = AmpValidationService.getInstance();
+            const validationResult: ValidationResult = await validator.validate(request.document);
+            if (validationResult.status === 'PASS') {
+                response.valid = true;
+            } else {
+                response.valid = false;
+                response.error = validator.parseValidationError(validationResult);
+            }
+        } catch (error) {
+            console.log(error.message);
+            response.error = error.message;
+        }
+
+        return response;
+    }
 }

@@ -8,3 +8,8 @@ export type ValidationResponse = {
 export type BulkValidationResponse = {
     [key: string]: ValidationResponse;
 };
+
+export type ContentValidationResponse = {
+    valid: null | boolean;
+    error: string;
+};

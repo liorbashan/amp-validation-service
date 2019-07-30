@@ -78,6 +78,25 @@ Response:
 
 ```
 
+# Validate HTML Content
+
+Send a post request:
+
+```javascript
+{
+	"document":"<body><div><span>Hello</span> <span>World</span></div><footer>about us:</footer></body>"
+}
+```
+
+Expect a JSON response:
+
+```javascript
+{
+    "error": "",
+    "valid": true
+}
+```
+
 ## Contributing
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
