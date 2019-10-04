@@ -8,9 +8,9 @@ import { AxiosResponse } from 'axios';
 import { IHttpClient } from '../interfaces/IHttpClient';
 import { Helper } from '../utils/Helper';
 
-@JsonController('/validate-page')
+@JsonController('/validate')
 export class ValidateController {
-    @Post('/')
+    @Post('/page')
     public async validate(@Body() validationRequest: ValidationRequest): Promise<ValidationResponse> {
         if (!Helper.isHttpRequestValid(validationRequest)) {
             throw new BadRequestError('string url property is missing');
@@ -44,7 +44,7 @@ export class ValidateController {
         return response;
     }
 
-    @Post('/validate-page-bulk')
+    @Post('/page-bulk')
     public async bulkValidate(@Body() request: ValidationRequest[]): Promise<BulkValidationResponse[]> {
         if (request.length > Number(process.env.BULK_SIZE)) {
             throw new BadRequestError(`Number of sites in request is limited to ${process.env.BULK_SIZE}`);
@@ -60,7 +60,7 @@ export class ValidateController {
         return result;
     }
 
-    @Post('/validate-html')
+    @Post('/html')
     public async validateHtml(@Body() request: ContentValidationRequest): Promise<ContentValidationResponse> {
         if (!Helper.isContentRequestValid(request)) {
             throw new BadRequestError('document must be a string');
