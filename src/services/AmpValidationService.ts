@@ -1,5 +1,7 @@
 import { IAmpValidator } from './../interfaces/IAmpValidator';
 import ampHtmlValidator, { ValidationResult } from 'amphtml-validator';
+import * as minifier from 'html-minifier';
+
 export class AmpValidationService implements IAmpValidator {
     private static instance: AmpValidationService;
     private constructor() {}
@@ -13,9 +15,15 @@ export class AmpValidationService implements IAmpValidator {
     public async validate(html: string): Promise<ValidationResult> {
         try {
             const validator = await ampHtmlValidator.getInstance();
-            return validator.validateString(html);
+            const minifiedHtml = minifier.minify(html, {
+                collapseWhitespace: true,
+                minifyCSS: true,
+                minifyJS: true,
+                removeComments: true,
+            });
+            return validator.validateString(minifiedHtml);
         } catch (error) {
-            const errMsg: string = ''; //ErrorHandler.getErrorMessage(error);
+            const errMsg: string = error.message || '';
             throw new Error(errMsg);
         }
     }
