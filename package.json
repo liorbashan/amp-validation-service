@@ -3,6 +3,9 @@
     "version": "1.0.0",
     "description": "A service that receives a web hook, and validates a list of known amp urls",
     "main": "dist/app.js",
+    "engines": {
+      "node": "8.11.3"
+    },
     "scripts": {
         "build": "npm run clean && tsc",
         "clean": "rm -rf ./dist",
