@@ -1,0 +1,19 @@
+version: "3.6"
+
+services:
+  amp-validator:
+    image: node:12
+    command: "sh develop-entry.sh"
+    working_dir: "/app/"
+    environment:
+      NODE_ENV: "development"
+      NODE_TLS_REJECT_UNAUTHORIZED: "0"
+      PORT: "3000"
+      BULK_SIZE: "50"
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./:/app
+      - "node-modules:/app/node_modules"
+volumes:
+  node-modules:
