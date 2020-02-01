@@ -3,6 +3,7 @@ version: "3.6"
 services:
   amp-validator:
     image: node:12
+    container_name: amp-val
     command: "sh develop-entry.sh"
     working_dir: "/app/"
     environment:
